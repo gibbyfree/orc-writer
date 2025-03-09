@@ -5,7 +5,6 @@ import time
 import pyarrow as pa
 import pyarrow.csv as pcsv
 import pyarrow.orc as porc
-import pandas as pd
 
 import tableinfo
 
@@ -61,7 +60,6 @@ def convert_dat_to_orc(dat_directory, output_directory, compression):
         start = time.time()
         porc.write_table(table, orc_path, compression=compression)
         end = time.time()
-        print(f"Converted {dat_path} to {orc_path}")
         print(f"Compression took {(end - start) * 1e3:.6f} ms for {orc_path}")
 
 
