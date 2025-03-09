@@ -4,4 +4,4 @@ Converts [TPC-DS](https://www.tpc.org/tpcds/) .dat files and [IMDB](https://data
 
 TPC-DS schema information is hardcoded in `tableinfo.py` for validation at conversion time. IMDB schema information is hardcoded in `imdb_tableinfo.py`.
 
-Usage: `python3 write.py {imdb|tpcds} {path to .dat dir} {output dir} [snappy|zlib|lz4|zstd]`
+Usage: `python3 write.py {imdb|tpcds} {path to .input dir} {output dir} [snappy|zlib|lz4|zstd]`
