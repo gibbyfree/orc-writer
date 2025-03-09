@@ -1,6 +1,7 @@
 import glob
 import os
 import sys
+import time
 import pyarrow as pa
 import pyarrow.csv as pcsv
 import pyarrow.orc as porc
@@ -57,29 +58,36 @@ def convert_dat_to_orc(dat_directory, output_directory, compression):
             continue
 
         orc_path = os.path.join(output_directory, f"{table_name}-{compression}.orc")
-        porc.write_table(table, orc_path, compression="snappy", file_version="0.11")
+        start = time.time()
+        porc.write_table(table, orc_path, compression=compression)
+        end = time.time()
         print(f"Converted {dat_path} to {orc_path}")
+        print(f"Compression took {(end - start) * 1e3:.6f} ms for {orc_path}")
 
 
-def read_and_print_orc(file_path):
-    try:
-        table = porc.read_table(file_path)
-        print(table.to_pandas())
-    except Exception as e:
-        print(f"Failed to read ORC file {file_path}: {str(e)}")
+def read_orc(orc_dir):
+    for orc_path in glob.glob(os.path.join(orc_dir, "*.orc")):
+        try:
+            start = time.time()
+            table = porc.read_table(orc_path)
+            end = time.time()
+
+            print(f"Decompression took {(end - start) * 1e3:.6f} ms for {orc_path}")
+        except Exception as e:
+            print(f"Failed to read ORC file {orc_path}: {str(e)}")
 
 
 if __name__ == "__main__":
     if len(sys.argv) < 3:
-        print("Usage: python3 write.py {/path/to/dat/files} {/path/to/orc/output}")
+        print(
+            "Usage: python3 write.py {/path/to/dat/files} {/path/to/orc/output} [compression]"
+        )
         sys.exit(1)
 
     dat_path = sys.argv[1]
     orc_path = sys.argv[2]
     # Can be uncompressed, gzip, zstd, snappy
-    # compression = sys.argv[3] if len(sys.argv) > 3 else "uncompressed"
+    compression = sys.argv[3] if len(sys.argv) > 3 else "uncompressed"
 
-    # convert_dat_to_orc(dat_path, orc_path, compression)
-
-    income_band_orc_path = os.path.join(orc_path, "web_page-uncompressed.orc")
-    read_and_print_orc(income_band_orc_path)
+    convert_dat_to_orc(dat_path, orc_path, compression)
+    read_orc(orc_path)
