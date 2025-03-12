@@ -53,7 +53,7 @@ def convert_to_orc(mode, input_directory, output_directory, compression):
             read_options=pcsv.ReadOptions(
                 autogenerate_column_names=(mode == "tpcds"), skip_rows=0  # No headers
             ),
-            convert_options=pcsv.ConvertOptions(null_values=["\\N"]),
+            convert_options=pcsv.ConvertOptions(null_values=["\\N", ""]),
         )
 
         # Handle trailing delimiter if needed
